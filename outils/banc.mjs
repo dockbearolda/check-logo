@@ -6,7 +6,8 @@
      node outils/banc.mjs <fichier|dossier> [...]
 
    Lit les PNG tels quels ; les JPG, WebP, HEIC… passent par `sips` (macOS).
-   Une ligne par fichier : ses mesures, puis les deux verdicts. */
+   Pour chaque fichier : ses mesures, puis la réponse (--prompt montre aussi
+   le prompt). */
 import { readFileSync, readdirSync, statSync, mkdtempSync } from 'node:fs'
 import { join, extname, basename } from 'node:path'
 import { tmpdir } from 'node:os'
@@ -14,15 +15,17 @@ import { execFileSync } from 'node:child_process'
 import { lirePng } from './png.mjs'
 import { analyser } from '../lib/analyse.js'
 import { juger } from '../lib/verdict.js'
+import { origineIA } from '../lib/format.js'
 import { COTE_ANALYSE } from '../lib/regles.js'
 
+const avecPrompt = process.argv.includes('--prompt')
 const fichiers = []
 const explorer = p => {
   if (statSync(p).isDirectory()) { for (const e of readdirSync(p)) explorer(join(p, e)) }
   else if (/\.(png|jpe?g|webp|gif|heic|bmp|tiff?)$/i.test(p)) fichiers.push(p)
 }
-for (const a of process.argv.slice(2)) explorer(a)
-if (!fichiers.length) { console.error('Usage : node outils/banc.mjs <fichier|dossier> [...]'); process.exit(1) }
+for (const a of process.argv.slice(2)) if (a !== '--prompt') explorer(a)
+if (!fichiers.length) { console.error('Usage : node outils/banc.mjs [--prompt] <fichier|dossier> [...]'); process.exit(1) }
 
 /* La réduction au grand côté d'analyse, par moyenne de zone — ce que fait le
    canevas du navigateur, à peu près. */
@@ -48,14 +51,18 @@ for (const f of fichiers) {
     let png = f
     const format = extname(f).slice(1).toLowerCase().replace('jpeg', 'jpg')
     if (format !== 'png') { png = join(temp, basename(f) + '.png'); execFileSync('sips', ['-s', 'format', 'png', f, '--out', png], { stdio: 'ignore' }) }
+    const octets = readFileSync(f)
     const natif = lirePng(readFileSync(png))
     const t0 = performance.now()
     const image = reduire(natif, COTE_ANALYSE)
     const m = analyser(image.d, image.l, image.h)
     const ms = Math.round(performance.now() - t0)
-    const v = juger({ format, sorte: 'image', natif: { l: natif.l, h: natif.h } }, m)
-    const mesures = m.vide ? 'vide' : `fond ${m.fond.sorte}${m.fond.sorte === 'uni' ? ' ' + m.fond.couleur : ''} · aplat ${m.aplat.toFixed(2)} · ${m.couleurs.length} coul. · flou ${m.flou == null ? '—' : m.flou.toFixed(2)} · fin ${m.fin || '—'} px · fondu ${(m.fondu * 100).toFixed(1)} %`
-    console.log(`\n${basename(f)}  ${natif.l}×${natif.h}  (${ms} ms)\n  ${mesures}\n  DTF     [${v.dtf.etat}] ${v.dtf.titre}\n  USINAGE [${v.usinage.etat}] ${v.usinage.titre}`)
+    const ia = origineIA(octets.subarray(0, 262144), basename(f)) || origineIA(octets.subarray(Math.max(0, octets.length - 262144)))
+    const v = juger({ format, sorte: 'image', natif: { l: natif.l, h: natif.h }, ia }, m)
+    const fond = m.fond.sorte + (m.fond.damier ? ' (damier)' : m.fond.sorte === 'uni' ? ' ' + m.fond.couleur : '')
+    const mesures = m.vide ? 'vide' : `fond ${fond} · aplat ${m.aplat.toFixed(2)} · ${m.couleurs.length} coul. · flou ${m.flou == null ? '—' : m.flou.toFixed(2)} · fondu ${(m.fondu * 100).toFixed(1)} %${ia ? ' · ' + ia : ''}`
+    console.log(`\n${basename(f)}  ${natif.l}×${natif.h}  (${ms} ms)\n  ${mesures}\n  [${v.etat}] ${v.mot} — ${v.titre}`)
+    if (avecPrompt && v.prompt) console.log(v.prompt.replace(/^/gm, '      '))
   } catch (e) {
     console.log(`\n${basename(f)}\n  illisible par le banc : ${e.message}`)
   }

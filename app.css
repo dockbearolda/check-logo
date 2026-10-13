@@ -6,7 +6,7 @@
    que mettre en page. La seule couleur de l'écran est celle d'un verdict.
 
    Pensée d'abord pour le téléphone : une colonne. À partir de 900 px, le
-   fichier à gauche, les verdicts à droite.
+   fichier à gauche, la réponse à droite.
    =========================================================================== */
 
 @font-face {
@@ -96,11 +96,11 @@ main { flex: 1; display: flex; flex-direction: column; }
   .resultat {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     grid-template-rows: auto 1fr;
-    grid-template-areas: "apercu verdicts" "constats verdicts";
+    grid-template-areas: "apercu verdict" "constats verdict";
     align-items: start;
   }
   .apercu { grid-area: apercu; }
-  .verdicts { grid-area: verdicts; }
+  .verdict { grid-area: verdict; }
   .constats { grid-area: constats; }
 }
 
@@ -145,21 +145,19 @@ main { flex: 1; display: flex; flex-direction: column; }
 
 .apercu__pied { min-width: 0; }
 .apercu__nom { font-weight: var(--graisse-note); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.apercu__legende { display: flex; flex-wrap: wrap; gap: var(--pas-1); }
 
 /* ---------------------------------------------------------------- LE VERDICT
-   Deux cartes, une par technique. La pastille dit l'état, le titre dit
-   pourquoi, le bloc gris dit quoi répondre. */
-.verdicts { display: flex; flex-direction: column; gap: var(--pas-3); }
+   UNE réponse. Le voyant et le mot disent l'état — c'est ce qu'on annonce,
+   en grand ; la ligne dessous dit pourquoi ; les blocs gris disent quoi
+   répondre au client et, s'il doit refaire son logo, quoi lui envoyer. */
 .verdict { display: flex; flex-direction: column; gap: var(--pas-3); }
 .verdict__tete { display: flex; align-items: center; gap: var(--pas-2); }
-.verdict__mots { min-width: 0; display: flex; flex-direction: column; gap: var(--pas-1); }
-.verdict__ligne { display: flex; flex-wrap: wrap; align-items: center; gap: var(--pas-1) var(--pas-2); }
-.verdict__nom { color: var(--text-2); font-weight: var(--graisse-note); }
-.verdict__titre {
-  font-size: var(--taille-titre); font-weight: var(--graisse-forte);
-  line-height: var(--ligne-titre); letter-spacing: -.01em; text-wrap: balance;
+.verdict__mot {
+  min-width: 0;
+  font-size: var(--taille-grand); font-weight: var(--graisse-forte);
+  line-height: var(--ligne-titre); letter-spacing: -.02em; text-wrap: balance;
 }
+.verdict__titre { font-weight: var(--graisse-note); text-wrap: pretty; }
 
 .dire {
   display: flex; flex-direction: column; gap: var(--pas-2);
@@ -167,17 +165,9 @@ main { flex: 1; display: flex; flex-direction: column; }
   border-radius: var(--arrondi-bloc); background: var(--zone-bg);
 }
 .dire__texte { text-wrap: pretty; }
+/* Le prompt garde ses lignes : il se colle tel quel dans ChatGPT. */
+.dire__prompt { white-space: pre-line; }
 .dire .btn { align-self: flex-start; }
-
-.tailles { display: flex; flex-direction: column; gap: var(--pas-1); }
-.tailles li {
-  display: flex; align-items: center; justify-content: space-between; gap: var(--pas-2);
-  padding: var(--pas-2) 0;
-  border-top: 1px solid var(--row-line);
-}
-.tailles li:first-child { border-top: 0; }
-.tailles li:last-child { padding-bottom: 0; }
-.tailles__nom { font-weight: var(--graisse-note); }
 
 /* ---------------------------------------------------------------- LES CONSTATS */
 .constats { display: flex; flex-direction: column; gap: var(--pas-2); }
