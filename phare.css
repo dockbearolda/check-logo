@@ -1,0 +1,335 @@
+/* ===========================================================================
+   PHAREDESIGN — LES JETONS, ET RIEN D'AUTRE
+   ---------------------------------------------------------------------------
+   Ce fichier ne contient QUE des jetons. Aucune règle, aucun sélecteur de
+   composant : c'est ce qui permet de le charger devant n'importe quelle page
+   sans rien lui imposer d'autre que son vocabulaire.
+
+   Il se charge EN PREMIER, avant toute autre feuille. Un écran ne redéclare
+   jamais un jeton — il en prend un, ou il en manque un.
+
+   Quatre familles :
+     · les couleurs — surfaces, texte, traits, accent, et les trois seules
+       couleurs sémantiques (danger / succès / attention) ;
+     · l'échelle de texte — quatre tailles, trois graisses, trois interlignes ;
+     · les formes et les boîtes — trois arrondis, une hauteur de contrôle ;
+     · le mouvement — trois durées, et la durée dit le GENRE de changement.
+
+   Fond gris neutre, cartes blanches liserées, accent = encre quasi noire.
+   LA COULEUR NE SERT QU'À DIRE UN ÉTAT.
+   =========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* ------------------------------------------------------------- SURFACES
+     Gris neutre unique : le fond détache les cartes blanches, aucune teinte
+     colorée n'entre dans les surfaces. */
+  --bg: #f5f6f8;                     /* fond général */
+  --surface: #fff;                   /* une carte, un panneau */
+  --surface-hover: #eef2f7;          /* survol générique */
+  --row-alt: #f5f6f8;                /* bande paire d'une liste (zébrage) */
+  --row-hover: #eef2f7;              /* survol de ligne, plus marqué que le zébrage */
+  --row-line: #edeff2;               /* filet de séparation entre lignes */
+  --field-focus: #f5f6f8;            /* fond d'un champ au focus */
+  --search-bg: #eef2f7;              /* pilule de recherche au repos */
+  --search-bg-hover: #e2e8f0;
+  --chip-on-tonal: #fff;             /* pastille compteur sur pilule active */
+  --zone-bg: #f5f6f8;                /* fond doux d'une zone groupée */
+
+  /* ---------------------------------------------------------------- TEXTE
+     Trois encres, et chacune a un métier. `--text-2` vaut #5f6774 et pas un
+     gris plus clair pour une raison arithmétique : il doit passer 4,5:1 sur
+     TOUTES les surfaces où la charte le pose, pas seulement sur le blanc.
+     Mesuré — blanc 5,71 · zone grise 5,28 · pastille 4,61 · survol 5,08.
+     Le cran d'avant (#6b7280) tombait à 4,47 dès qu'il quittait le blanc,
+     c'est-à-dire le jour où des bulles grises sont arrivées dans l'écran.
+     AVANT D'AJOUTER UNE SURFACE QUI PORTERA DU TEXTE SECONDAIRE : vérifier
+     le ratio dessus. */
+  --text-1: #1f2937;                 /* principal */
+  --text-2: #5f6774;                 /* secondaire / intitulés / en-têtes */
+  --text-3: #9ca3af;                 /* atténué — des repères, PAS du texte à lire */
+
+  /* -------------------------------------------------------------- TRAITS
+     Le contour porte la forme, l'ombre ne fait qu'y aider. */
+  --border: #e1e5ea;
+  --border-soft: #e5e7eb;            /* sert AUSSI de fond (pastilles, jetons) */
+  --card-border: #e5e7eb;            /* liseré des cartes */
+  --border-strong: #cbd2da;          /* le même trait, au survol / au focus */
+
+  /* Couches d'état, à superposer plutôt qu'à recolorer */
+  --state-hover: rgba(17, 24, 39, .05);
+  --state-press: rgba(17, 24, 39, .09);
+
+  /* -------------------------------------------------------------- ACCENT
+     Encre quasi noire, SEULE couleur d'action de l'interface. Pas de bleu de
+     marque, pas de dégradé : ce qui engage porte l'encre pleine. */
+  --primary: #111827;
+  --primary-hover: #000;
+  --primary-rgb: 17, 24, 39;         /* pour un halo en opacité variable */
+  --on-primary: #fff;                /* encre posée SUR l'accent plein */
+  --primary-soft: #eef2f7;           /* pilule active / fond accent clair */
+  --primary-soft-hover: #e2e8f0;
+
+  /* ----------------------------------------------------------- SÉMANTIQUE
+     LES SEULES COULEURS DU SYSTÈME. Trois, pas quatre. Une icône décorative
+     colorée est un défaut, pas une variante. */
+  --danger:  #b91c1c;   --danger-bg:  #fef2f2;   --danger-line:  #fecaca;
+  --success: #166534;   --success-bg: #ecfdf3;   --success-line: #bbf7d0;
+  --warning: #854d0e;   --warning-bg: #fefce8;   --warning-line: #fde68a;
+  /* En composantes : un anneau « enregistré » s'éteint en fondu, il lui faut
+     une opacité variable — impossible à partir du seul hexadécimal. */
+  --success-rgb: 22, 101, 52;
+  /* Deux crans d'ambre en plus : une échelle d'urgence a besoin de trois
+     niveaux lisibles sans sortir de la famille. */
+  --warning-deep: #713f12;           /* le plus appuyé */
+  --warning-2:    #a16207;           /* le plus clair */
+
+  /* ------------------------------------------------------- PALETTE D'ÉTAT
+     Texte + fond d'une pastille qui dit où en est une chose. Gris par défaut :
+     la couleur n'arrive que quand l'étape porte un vrai sens d'état.
+     Chaque teinte passe 4,5:1 SUR SON PROPRE FOND — c'est la seule façon de
+     les employer, et un gris de plus clair échouait à 4,39. */
+  --st-neutre:  #4b5563;   --st-neutre-bg:  #eef2f7;   /* au repos, à venir */
+  --st-cours:   #854d0e;   --st-cours-bg:   #fefce8;   /* en cours */
+  --st-ok:      #166534;   --st-ok-bg:      #ecfdf3;   /* abouti */
+  --st-fort:    #111827;   --st-fort-bg:    #e5e7eb;   /* clos, appuyé */
+  --st-eteint:  #676e7b;   --st-eteint-bg:  #f3f4f6;   /* rangé, hors course */
+  --st-bloque:  #b91c1c;   --st-bloque-bg:  #fef2f2;   /* bloqué */
+
+  /* ----------------------------------------------------------- ÉLÉVATIONS
+     Trois niveaux, pas davantage : la carte, le flottant, la modale. */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, .05);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, .05);
+  --shadow-pop: 0 16px 40px rgba(0, 0, 0, .25);
+
+  --scrollbar: #d1d5db;
+  --scrollbar-hover: #9ca3af;
+
+  /* ------------------------------------------------------------ INFOBULLE
+     Surface inversée — elle s'inverse aussi de nuit. */
+  --tip-bg: #1f2937;
+  --tip-fg: #f5f6f8;
+
+  /* ------------------------------------------------------------ LE SUPPORT
+     Ce sur quoi l'aperçu d'un logo se pose, comme sur un textile : clair
+     d'office, sombre quand le logo est clair — un logo blanc ne se lit pas
+     sur du blanc. Il ne suit PAS le thème : c'est le logo qui décide. */
+  --support-clair: #f5f6f8;
+  --support-sombre: #1f2937;
+
+  /* ---------------------------------------------------------- LE MOUVEMENT
+     LA DURÉE DIT QUEL GENRE DE CHANGEMENT SE PRODUIT, ce n'est pas un chiffre
+     choisi au hasard. Faire répondre un survol en 200 ms — la durée d'un
+     panneau qui s'ouvre — rend une interface MOLLE alors que rien n'est lent.
+
+       --dur-1  RETOUR IMMÉDIAT — fond, trait, couleur, ombre : tout ce qui
+                répond au curseur, au survol, au focus. C'est un accusé de
+                réception : au-delà de ~120 ms l'œil le lit comme un délai.
+       --dur-2  UN OBJET QUI ENTRE OU SORT — `transform` et `opacity` : un
+                panneau, une infobulle, un message. Là, 200 ms se lisent
+                comme un mouvement, pas comme une attente.
+       --dur-3  les grands déplacements, rares. */
+  --ease: cubic-bezier(.2, 0, 0, 1);
+  --dur-1: .12s;
+  --dur-2: .2s;
+  --dur-3: .32s;
+  /* LE DÉLAI AVANT QU'ON AVOUE ATTENDRE — ce n'est pas une quatrième durée de
+     mouvement, c'est un SILENCE. Une liste sortante ne se voile qu'après ce
+     temps : une réponse plus rapide ne fait donc rien clignoter du tout.
+     Ce délai CSS remplace le minuteur qu'il aurait fallu armer, puis annuler,
+     en JavaScript. */
+  --delai-aveu: .16s;
+  /* LE SCAN — une traversée du faisceau sur l'aperçu, de haut en bas. Ce
+     n'est pas un retour ni un déplacement : c'est le temps que l'œil met à
+     lire « on regarde votre fichier ». Elle boucle tant que l'analyse tourne. */
+  --dur-scan: 1.1s;
+
+  /* --------------------------------------------------------- LES TROIS FORMES
+     ET LA FORME DIT LE RÔLE :
+       · rectangle arrondi (--arrondi-champ) = ça se remplit ou ça agit ;
+       · rond parfait                        = une icône seule, une initiale ;
+       · pilule (--pilule)                   = une étiquette, un état, un compteur.
+     Un bouton d'action ne prend donc JAMAIS la pilule — sinon plus rien ne
+     distingue une action d'une étiquette. */
+  --radius: 10px;                        /* champ, bouton, pastille */
+  --radius-card: 16px;                   /* la carte */
+  --pilule: 999px;                       /* un rectangle très arrondi n'est pas
+                                            une pilule : c'est le rayon
+                                            SUPÉRIEUR à la demi-hauteur qui l'est */
+  --arrondi-champ: var(--radius);
+  --arrondi-carte: var(--radius-card);
+  --arrondi-bloc: var(--arrondi-carte);  /* un bloc dans une carte EST une carte */
+
+  /* La police. À HÉBERGER SOI-MÊME et à précharger — voir SKILL.md.
+     Manrope s'arrête à 800 : un `font-weight: 900` est raboté et rendu
+     EXACTEMENT comme un 800, une marche qui ne se voit pas. */
+  --font: 'Manrope', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+}
+
+/* ===========================================================================
+   L'ÉCHELLE DE TEXTE
+   ---------------------------------------------------------------------------
+   QUATRE TAILLES, ET CHACUNE A UN SEUL MÉTIER. Un écran qui en compte vingt-
+   cinq (10, 11, 11.5, 12, 12.5, 13…) n'a pas une hiérarchie fine : il a du
+   désordre. Un écart d'un demi-pixel ne se lit pas.
+
+   UNE SURFACE DONNÉE N'EN PREND QUE DEUX : celle qui se lit, et celle qu'on
+   annonce. Le reste de la hiérarchie se fait à la GRAISSE et à la COULEUR.
+
+   TROIS GRAISSES. Le gras par défaut du navigateur vaut 700 — une quatrième
+   graisse par la porte de derrière : la ramener par
+   `b, strong { font-weight: var(--graisse-forte) }`.
+
+   Les quatre marches montent d'au moins +12 % en pixels entiers
+   (14 → 17 → 21 → 32). Ne pas les bouger sans refaire le calcul.
+   =========================================================================== */
+:root {
+  --taille-note: 14px;    /* intitulé de champ, aide, méta, pastille, étape */
+  --taille-texte: 17px;   /* ce qui se lit ET ce qui se saisit */
+  --taille-titre: 21px;   /* titre d'une carte, d'une section */
+  --taille-grand: 32px;   /* les chiffres qu'on annonce */
+
+  --graisse-texte: 400;
+  --graisse-note: 600;
+  --graisse-forte: 800;
+
+  --ligne-titre: 1.2;
+  --ligne-texte: 1.45;
+  /* Les champs et les boutons : en RAPPORT et jamais en `normal`, sinon la
+     boîte d'un div ne se calcule pas comme celle d'un champ — et un bouton
+     avec une icône dedans décide tout seul de sa hauteur. */
+  --ligne-champ: 1.375;
+
+  /* ===================================================== LA BOÎTE UNIQUE
+     Tout ce qui se clique et se remplit fait cette hauteur : champ, zone de
+     texte, liste déroulante, bouton d'action. UNE valeur, à un seul endroit.
+
+     ELLE NE S'ÉCRIT JAMAIS EN DUR sur un composant : elle SORT de la taille
+     de texte, de l'interligne et du rembourrage. 17 × 1,375 + 2 × 13 = 49,4.
+     Un `min-height` en pixels sur une commande est un défaut. */
+  --ctrl-h: 50px;
+  --champ-y: 13px;
+  --champ-x: 14px;
+
+  /* LA BOÎTE SERRÉE — une action posée DANS une ligne de liste, quand une
+     commande de pleine taille coûterait trop de hauteur par ligne.
+     UNE SEULE, jamais deux. Elle a QUATRE ingrédients, et il en manque
+     toujours un : le texte, l'interligne, le rembourrage — ET LE TRAIT
+     RÉSERVÉ. Cinq boutons au rembourrage identique ont donné 37 / 39 / 40 /
+     44 / 50 px : `line-height: normal` sur trois d'entre eux, et un trait
+     transparent sur un seul. 17 × 1,375 + 2 × 7 + 2 × 1 = 39,4 px, toujours. */
+  --champ-y-serre: 7px;
+  --ligne-serre: var(--ligne-champ);
+  --trait-reserve: 1px solid transparent;
+
+  /* ============================================================== LE ROND
+     L'autre boîte, celle qui ne porte PAS de mot : une icône seule, une
+     initiale. La forme dit déjà le rôle ; il ne manque que la TAILLE, et
+     c'est là que ça dérape — cinq ronds pour une même initiale, sur des
+     écrans ouverts à un clic les uns des autres. Deux, et chacun a un métier :
+
+       --rond        il COIFFE un objet — une carte, un en-tête, un bouton
+                     d'icône de barre. C'est la boîte du bouton « revenir ».
+       --rond-serre  il est POSÉ DANS une ligne de texte — une initiale au
+                     milieu d'un libellé, la croix qui efface une note.
+                     Il suit la ligne, il ne la fait pas grandir. */
+  --rond: 44px;
+  --rond-serre: 26px;
+
+  /* ============================================================= L'ICÔNE
+     Trois tailles, et la taille dit la DISTANCE DE LECTURE — pas l'importance
+     de l'icône. */
+  --ic-serre: 16px;   /* collée à un mot, dans une ligne */
+  --ic: 20px;         /* l'icône courante : barre, bouton, menu */
+  --ic-grand: 24px;   /* en-tête de section */
+  --ic-tuile: 40px;   /* une grande tuile, lue de loin */
+
+  /* ============================================================ LES ÉCARTS
+     QUATRE PAS, PAS DAVANTAGE. Sept écarts (2, 7, 10, 11, 12, 14, 18) et sept
+     rembourrages, c'est un panneau dont le titre, le corps et le pied
+     commencent chacun à un endroit différent — rien ne s'aligne, et personne
+     ne sait dire pourquoi. */
+  --pas-1: 6px;    /* dans une ligne : un pictogramme et son mot */
+  --pas-2: 10px;   /* entre deux éléments d'un même groupe */
+  --pas-3: 16px;   /* gouttière d'un formulaire, rembourrage d'un bloc */
+  --pas-4: 24px;   /* rembourrage d'une carte, entre deux blocs */
+
+  /* La colonne des valeurs d'un tableau. FIXE, jamais `auto` : deux tables
+     imbriquées se dimensionneraient chacune sur son plus long nombre, et les
+     virgules ne tomberaient pas sur la même verticale. */
+  --tab-valeur: 190px;
+}
+
+/* ===========================================================================
+   THÈME SOMBRE — la même charte, retournée
+   ---------------------------------------------------------------------------
+   L'accent encre devient encre CLAIRE : d'où `--on-primary` qui repasse en
+   sombre. Un `color: #fff` en dur sur l'accent y devient invisible — c'est le
+   piège numéro un, et la raison pour laquelle on passe TOUJOURS par le jeton.
+
+   Les fonds sémantiques passent en translucide : un texte de page se lirait au
+   travers. Les composer sur `--surface` :
+     background: linear-gradient(var(--danger-bg), var(--danger-bg)), var(--surface);
+   =========================================================================== */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #111827;
+  --surface: #1f2937;
+  --surface-hover: #2b3546;
+  --row-alt: #1a2331;
+  --row-hover: #2b3546;
+  --row-line: #374151;
+  --field-focus: #2b3546;
+  --search-bg: #29323f;
+  --search-bg-hover: #374151;
+  --chip-on-tonal: #111827;
+  --zone-bg: #1a2331;
+
+  /* Même arithmétique qu'en clair : #9ca3af passait sur les fonds de base mais
+     tombait à 4,06 sur `--primary-soft`, qui porte du texte secondaire.
+     #aab1bc passe partout — 8,2 sur le fond, 6,8 sur une carte, 4,77 au pire. */
+  --text-1: #f3f4f6;
+  --text-2: #aab1bc;
+  --text-3: #6b7280;
+
+  --border: #374151;
+  --border-soft: #2b3441;
+  --card-border: #374151;
+  --border-strong: #4b5563;
+
+  --state-hover: rgba(243, 244, 246, .06);
+  --state-press: rgba(243, 244, 246, .1);
+
+  --tip-bg: #f3f4f6;
+  --tip-fg: #111827;
+
+  --primary: #f3f4f6;
+  --primary-hover: #fff;
+  --primary-rgb: 243, 244, 246;
+  --on-primary: #111827;
+  --primary-soft: #374151;
+  --primary-soft-hover: #4b5563;
+
+  --danger:  #fca5a5;   --danger-bg:  rgba(185, 28, 28, .2);   --danger-line:  rgba(185, 28, 28, .5);
+  --success: #86efac;   --success-bg: rgba(22, 101, 52, .25);  --success-line: rgba(22, 101, 52, .55);
+  --warning: #fcd34d;   --warning-bg: rgba(133, 77, 14, .25);  --warning-line: rgba(133, 77, 14, .55);
+  --success-rgb: 134, 239, 172;
+  --warning-deep: #fef3c7;
+  --warning-2:    #fde68a;
+
+  --st-neutre:  #d1d5db;   --st-neutre-bg:  #2b3546;
+  --st-cours:   #fcd34d;   --st-cours-bg:   #3a2f14;
+  --st-ok:      #86efac;   --st-ok-bg:      #14301f;
+  --st-fort:    #f3f4f6;   --st-fort-bg:    #374151;
+  --st-eteint:  #9ca3af;   --st-eteint-bg:  #262f3c;
+  --st-bloque:  #fca5a5;   --st-bloque-bg:  #3a1c1c;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, .35);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, .4);
+  --shadow-pop: 0 16px 40px rgba(0, 0, 0, .55);
+
+  --scrollbar: #4b5563;
+  --scrollbar-hover: #6b7280;
+}

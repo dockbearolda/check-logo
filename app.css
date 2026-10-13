@@ -1,0 +1,203 @@
+/* ===========================================================================
+   CHECK LOGO — LA PAGE
+   ---------------------------------------------------------------------------
+   Se charge après phare.css (les jetons) et phare-composants.css (la carte,
+   le bouton, la pastille). Cette feuille ne pose AUCUNE valeur : elle ne fait
+   que mettre en page. La seule couleur de l'écran est celle d'un verdict.
+
+   Pensée d'abord pour le téléphone : une colonne. À partir de 900 px, le
+   fichier à gauche, les verdicts à droite.
+   =========================================================================== */
+
+@font-face {
+  font-family: 'Manrope';
+  src: url('manrope-latin.woff2') format('woff2');
+  font-weight: 400 800; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+                 U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+                 U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('manrope-latin-ext.woff2') format('woff2');
+  font-weight: 400 800; font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ------------------------------------------------------------------ LE SOCLE */
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg); color: var(--text-1);
+  font-family: var(--font); font-size: var(--taille-texte);
+  font-weight: var(--graisse-texte); line-height: var(--ligne-texte);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, p, ul { margin: 0; padding: 0; }
+h1, h2 { font-size: inherit; font-weight: inherit; }
+ul { list-style: none; }
+[hidden] { display: none !important; }
+
+.note { color: var(--text-2); font-size: var(--taille-note); font-weight: var(--graisse-note); }
+
+/* La page : bornée en largeur, jamais étirée ; elle respecte l'encoche et les
+   barres du téléphone. */
+.page {
+  box-sizing: border-box;
+  max-width: 1120px; min-height: 100dvh; margin: 0 auto;
+  padding:
+    max(var(--pas-3), env(safe-area-inset-top))
+    max(var(--pas-3), env(safe-area-inset-right))
+    max(var(--pas-3), env(safe-area-inset-bottom))
+    max(var(--pas-3), env(safe-area-inset-left));
+  display: flex; flex-direction: column; gap: var(--pas-3);
+}
+main { flex: 1; display: flex; flex-direction: column; }
+
+/* L'en-tête garde la hauteur d'un bouton même sans bouton : « Autre fichier »
+   paraît sans rien pousser. */
+.entete { display: flex; align-items: center; gap: var(--pas-3); min-height: var(--ctrl-h); }
+.entete h1 {
+  font-size: var(--taille-titre); font-weight: var(--graisse-forte);
+  line-height: var(--ligne-titre); letter-spacing: -.01em;
+}
+.entete .btn { margin-left: auto; }
+
+.pied { text-align: center; }
+
+/* ------------------------------------------------------------------ LE DÉPÔT
+   L'écran vide est une invitation : une seule zone, une seule action. */
+.depot {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--pas-3);
+  padding: calc(2 * var(--pas-4)) var(--pas-4);
+  border: 2px dashed var(--border-strong); box-shadow: none;
+  text-align: center; cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+}
+.survol .depot { border-color: var(--primary); background: var(--primary-soft); }
+.depot__picto { width: var(--ic-tuile); height: var(--ic-tuile); }
+.depot__titre {
+  max-width: 26ch;
+  font-size: var(--taille-titre); font-weight: var(--graisse-forte);
+  line-height: var(--ligne-titre); letter-spacing: -.01em; text-wrap: balance;
+}
+.depot__texte { max-width: 46ch; color: var(--text-2); text-wrap: pretty; }
+/* Glisser et coller : au clavier et à la souris seulement. */
+.depot__aide { display: none; }
+@media (hover: hover) and (pointer: fine) { .depot__aide { display: block; } }
+
+/* ---------------------------------------------------------------- LE RÉSULTAT */
+.resultat { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--pas-3); }
+@media (min-width: 900px) {
+  .resultat {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "apercu verdicts" "constats verdicts";
+    align-items: start;
+  }
+  .apercu { grid-area: apercu; }
+  .verdicts { grid-area: verdicts; }
+  .constats { grid-area: constats; }
+}
+
+/* ------------------------------------------------------------------ L'APERÇU
+   Le logo posé sur son support, comme sur un textile. Le cadre garde ses
+   proportions : rien ne bouge quand l'image arrive. */
+.apercu { display: flex; flex-direction: column; gap: var(--pas-3); }
+.support {
+  position: relative; overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--border-soft); border-radius: var(--arrondi-bloc);
+  background: var(--support-clair);
+  transition: background var(--dur-2) var(--ease);
+}
+.support.sombre { background: var(--support-sombre); border-color: var(--support-sombre); }
+.survol .support { border-color: var(--primary); }
+.support canvas {
+  position: absolute; inset: var(--pas-3);
+  width: calc(100% - 2 * var(--pas-3)); height: calc(100% - 2 * var(--pas-3));
+  object-fit: contain;
+}
+/* Un fichier qui ne s'ouvre pas ici : son format, en grand. */
+.support__format {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  color: var(--text-3);
+  font-size: var(--taille-grand); font-weight: var(--graisse-forte); letter-spacing: .04em;
+}
+
+/* LE SCAN : un trait qui descend sur le fichier tant que l'analyse tourne. */
+.faisceau {
+  position: absolute; inset: 0; pointer-events: none;
+  border-bottom: 2px solid var(--primary);
+  background: linear-gradient(to bottom, transparent 60%, rgba(var(--primary-rgb), .1));
+  opacity: 0; transform: translateY(-100%);
+}
+.support.sombre .faisceau { border-bottom-color: var(--on-primary); background: none; }
+[data-etat="scan"] .faisceau { opacity: 1; animation: balayage var(--dur-scan) linear infinite; }
+@keyframes balayage { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  [data-etat="scan"] .faisceau { animation: none; opacity: 0; }
+}
+
+.apercu__pied { min-width: 0; }
+.apercu__nom { font-weight: var(--graisse-note); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.apercu__legende { display: flex; flex-wrap: wrap; gap: var(--pas-1); }
+
+/* ---------------------------------------------------------------- LE VERDICT
+   Deux cartes, une par technique. La pastille dit l'état, le titre dit
+   pourquoi, le bloc gris dit quoi répondre. */
+.verdicts { display: flex; flex-direction: column; gap: var(--pas-3); }
+.verdict { display: flex; flex-direction: column; gap: var(--pas-3); }
+.verdict__tete { display: flex; align-items: center; gap: var(--pas-2); }
+.verdict__mots { min-width: 0; display: flex; flex-direction: column; gap: var(--pas-1); }
+.verdict__ligne { display: flex; flex-wrap: wrap; align-items: center; gap: var(--pas-1) var(--pas-2); }
+.verdict__nom { color: var(--text-2); font-weight: var(--graisse-note); }
+.verdict__titre {
+  font-size: var(--taille-titre); font-weight: var(--graisse-forte);
+  line-height: var(--ligne-titre); letter-spacing: -.01em; text-wrap: balance;
+}
+
+.dire {
+  display: flex; flex-direction: column; gap: var(--pas-2);
+  padding: var(--pas-3);
+  border-radius: var(--arrondi-bloc); background: var(--zone-bg);
+}
+.dire__texte { text-wrap: pretty; }
+.dire .btn { align-self: flex-start; }
+
+.tailles { display: flex; flex-direction: column; gap: var(--pas-1); }
+.tailles li {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--pas-2);
+  padding: var(--pas-2) 0;
+  border-top: 1px solid var(--row-line);
+}
+.tailles li:first-child { border-top: 0; }
+.tailles li:last-child { padding-bottom: 0; }
+.tailles__nom { font-weight: var(--graisse-note); }
+
+/* ---------------------------------------------------------------- LES CONSTATS */
+.constats { display: flex; flex-direction: column; gap: var(--pas-2); }
+.constats__titre {
+  font-size: var(--taille-titre); font-weight: var(--graisse-forte);
+  line-height: var(--ligne-titre); letter-spacing: -.01em;
+}
+.constats__liste li {
+  display: flex; align-items: flex-start; gap: var(--pas-2);
+  padding: var(--pas-2) 0;
+  border-top: 1px solid var(--row-line);
+}
+.constats__liste li:first-child { border-top: 0; }
+.constats__liste li:last-child { padding-bottom: 0; }
+
+/* LA MARQUE : un rond, et sa couleur dit l'état — le voyant d'un verdict (en
+   grand), la puce d'un constat (en petit). Grise tant qu'on ne sait pas. */
+.marque { background: var(--st-neutre-bg); color: var(--st-neutre); }
+.marque.ok { background: var(--st-ok-bg); color: var(--st-ok); }
+.marque.limite { background: var(--st-cours-bg); color: var(--st-cours); }
+.marque.non { background: var(--st-bloque-bg); color: var(--st-bloque); }
+.marque svg { width: var(--ic); height: var(--ic); }
+.marque.serre svg { width: var(--ic-serre); height: var(--ic-serre); }

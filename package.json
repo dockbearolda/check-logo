@@ -1,0 +1,8 @@
+{
+  "name": "check-logo-olda",
+  "private": true,
+  "description": "Check logo — le logo du client est-il bon pour l'impression DTF et l'usinage ? En ligne sur https://dockbearolda.github.io/check-logo/",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": { "start": "node serveur.mjs", "test": "node --test" }
+}

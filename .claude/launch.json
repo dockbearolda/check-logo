@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "check-logo",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["serveur.mjs"],
+      "port": 8140
+    }
+  ]
+}
