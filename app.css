@@ -110,7 +110,9 @@ main { flex: 1; display: flex; flex-direction: column; }
 .apercu { display: flex; flex-direction: column; gap: var(--pas-3); }
 .support {
   position: relative; overflow: hidden;
-  aspect-ratio: 4 / 3;
+  /* Jamais plus de 40 % de l'écran : la réponse, juste dessous, se lit sans
+     faire défiler. */
+  aspect-ratio: 4 / 3; max-height: 40dvh;
   border: 1px solid var(--border-soft); border-radius: var(--arrondi-bloc);
   background: var(--support-clair);
   transition: background var(--dur-2) var(--ease);
