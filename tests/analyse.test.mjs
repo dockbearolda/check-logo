@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { lireFond, lireEncre, lireCouleurs, lireFondu, lireFlou, distances, epaisseurs, traitFin, analyser } from '../lib/analyse.js'
+import { lireFond, lireEncre, lireCouleurs, lireFondu, lireFlou, analyser } from '../lib/analyse.js'
 import { FLOU_REF, FLOU_NET, PART_APLAT, FONDU_PART } from '../lib/regles.js'
 import { toile, rect, disque, flouter, agrandir, photo } from './dessin.mjs'
 
@@ -82,54 +82,44 @@ test('les couleurs : un aplat passé en JPEG (du bruit) reste un aplat', () => {
 
 test('le fondu : un contour lissé n’en est pas un, une ombre si', () => {
   const net = logo()
-  assert.ok(lireFondu(net.d, net.l, net.h).part < FONDU_PART / 4)
+  assert.ok(lireFondu(net.d, net.l, net.h) < FONDU_PART / 4)
   const ombre = toile(400, 300)
   rect(ombre, 150, 100, 140, 120, [0, 0, 0, 120])
   const o = flouter(ombre, 8)
   disque(o, 200, 150, 60, ROUGE)
-  assert.ok(lireFondu(o.d, o.l, o.h).part > FONDU_PART)
+  assert.ok(lireFondu(o.d, o.l, o.h) > FONDU_PART)
   const translucide = toile(200, 200)
   rect(translucide, 40, 40, 120, 120, [0, 0, 0, 150])
-  assert.ok(lireFondu(translucide.d, translucide.l, translucide.h).part > 0.5)
+  assert.ok(lireFondu(translucide.d, translucide.l, translucide.h) > 0.5)
 })
 
-test('la distance au fond', () => {
-  const l = 9, h = 5
-  const m = new Uint8Array(l * h)
-  for (let y = 1; y < 4; y++) for (let x = 1; x < 8; x++) m[y * l + x] = 1
-  const d = distances(m, l, h)
-  assert.equal(d[0], 0)
-  assert.equal(d[1 * l + 1], 1)
-  assert.equal(d[2 * l + 4], 4)   /* au centre d'une bande de 3 : à 2 du fond, au carré */
-})
-
-test('le trait le plus fin : un filet se voit, une forme pleine non', () => {
-  const plein = toile(300, 200)
-  rect(plein, 40, 40, 200, 100, NOIR)
-  const mp = lireEncre(plein.d, plein.l, plein.h, lireFond(plein.d, plein.l, plein.h)).encre
-  assert.equal(traitFin(epaisseurs(mp, 300, 200), 300, 200), 0)
-
-  for (const [epaisseur, min, max] of [[1, 1, 2], [3, 2.5, 4], [6, 5, 7]]) {
-    const t = toile(300, 200)
-    rect(t, 40, 40, 200, 100, NOIR)
-    rect(t, 20, 160, 240, epaisseur, NOIR)
-    const m = lireEncre(t.d, t.l, t.h, lireFond(t.d, t.l, t.h)).encre
-    const fin = traitFin(epaisseurs(m, 300, 200), 300, 200)
-    assert.ok(fin >= min && fin <= max, `filet de ${epaisseur} px mesuré à ${fin}`)
+/* Le faux fond transparent d'une IA : un damier gris et blanc DESSINÉ. */
+function damier(l, h, case_ = 16) {
+  const t = toile(l, h, BLANC)
+  for (let y = 0; y < h; y++) for (let x = 0; x < l; x++) {
+    if (((x / case_) | 0) + ((y / case_) | 0) & 1) { const i = (y * l + x) * 4; t.d[i] = t.d[i + 1] = t.d[i + 2] = 204 }
   }
-})
+  return t
+}
 
-test('le trait le plus fin : des pointes ne sont pas des traits', () => {
-  const t = toile(400, 300)
-  /* une étoile de triangles pointus autour d'un carré plein */
-  rect(t, 150, 100, 100, 100, NOIR)
-  for (let k = 0; k < 60; k++) {
-    rect(t, 250 + k, 150 - Math.round((60 - k) / 4), 1, Math.round((60 - k) / 2), NOIR)
-    rect(t, 150 - k, 150 - Math.round((60 - k) / 4), 1, Math.round((60 - k) / 2), NOIR)
-  }
-  const m = lireEncre(t.d, t.l, t.h, lireFond(t.d, t.l, t.h)).encre
-  const fin = traitFin(epaisseurs(m, 400, 300), 400, 300)
-  assert.ok(fin === 0 || fin > 6, 'pointes mesurées à ' + fin)
+test('le faux damier « transparent » est un fond, pas un dessin', () => {
+  const t = damier(400, 300)
+  disque(t, 120, 150, 90, ROUGE)
+  rect(t, 220, 90, 140, 120, BLEU)
+  const f = lireFond(t.d, t.l, t.h)
+  assert.equal(f.sorte, 'uni')
+  assert.equal(f.damier, true)
+  const { encre, cadre } = lireEncre(t.d, t.l, t.h, f)
+  assert.ok(cadre.x >= 28 && cadre.x <= 32, 'le cadre serre le logo : ' + cadre.x)
+  const c = lireCouleurs(t.d, t.l, t.h, encre)
+  assert.equal(c.couleurs.length, 2)
+  assert.ok(c.aplat >= 0.98)
+  /* un logo gris et blanc sur fond blanc n'est pas un damier */
+  const g = toile(400, 300, BLANC)
+  rect(g, 100, 100, 200, 100, [204, 204, 204, 255])
+  assert.equal(lireFond(g.d, g.l, g.h).damier, false)
+  /* ni un vrai fond blanc */
+  assert.equal(lireFond(logo(400, 300, BLANC).d, 400, 300).damier, false)
 })
 
 test('le flou : net, puis agrandi', () => {
@@ -157,16 +147,12 @@ test('l’analyse entière', () => {
   assert.equal(m.vide, false)
   assert.equal(m.fond.sorte, 'transparent')
   assert.equal(m.couleurs.length, 2)
-  assert.equal(m.fin, 0)
   assert.ok(m.flou <= FLOU_NET)
   assert.ok(m.fondu < FONDU_PART)
   assert.ok(m.cadre.l > 650 && m.cadre.l < 670, 'cadre ' + m.cadre.l)
-  assert.equal(m.cartes.ep.length, 800 * 600)
 
   const vide = toile(100, 100, BLANC)
   assert.equal(analyser(vide.d, 100, 100).vide, true)
   const p = photo(320, 240)
-  const mp = analyser(p.d, p.l, p.h)
-  assert.equal(mp.fond.sorte, 'plein')
-  assert.equal(mp.fin, 0)
+  assert.equal(analyser(p.d, p.l, p.h).fond.sorte, 'plein')
 })

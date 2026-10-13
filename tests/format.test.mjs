@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { formatDe, formatParNom, impasseDe } from '../lib/format.js'
+import { formatDe, formatParNom, impasseDe, origineIA } from '../lib/format.js'
 import { compterOperations } from '../lib/lecture.js'
 
 const octets = (...o) => new Uint8Array([...o, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -52,4 +52,16 @@ test('un PDF : vectoriel, image seule, ou les deux', () => {
   assert.deepEqual(seule.image, { l: 1406, h: 1300 })
   /* des tracés ET une image */
   assert.equal(compterOperations([91, 91, 91, 44, 85], [[22], [22], [22], [], ['i', 300, 200]], OPS).sorte, 'mixte')
+})
+
+test('créé par une IA : la signature du fichier, ou son nom', () => {
+  /* ce que porte un PNG sorti de ChatGPT, dans son morceau caBX */
+  assert.equal(origineIA(texte('\x89PNG....caBX....jumb....c2pa....OpenAI....gpt-image....trainedAlgorithmicMedia')), 'ChatGPT')
+  assert.equal(origineIA(texte('\x89PNG....c2pa....trainedAlgorithmicMedia....')), 'une IA')
+  assert.equal(origineIA(texte('\x89PNG....IDAT....')), null)
+  /* le nom suffit — ChatGPT nomme ses images, en anglais comme en français */
+  assert.equal(origineIA(new Uint8Array(8), 'ChatGPT Image 27 août 2026, 15_42_44.png'), 'ChatGPT')
+  assert.equal(origineIA(new Uint8Array(8), 'Image ChatGPT 30 sept. 2026, 11_48_57.png'), 'ChatGPT')
+  assert.equal(origineIA(new Uint8Array(8), 'DALL·E 2025-01-12 logo.webp'), 'ChatGPT')
+  assert.equal(origineIA(new Uint8Array(8), 'logo-client.png'), null)
 })
