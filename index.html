@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#f5f6f8">
 <meta name="robots" content="noindex">
 <title>Check logo · OLDA</title>
-<meta name="description" content="Le logo du client est-il bon pour l'atelier ? Déposez-le : le contrôle dit quoi répondre, et le prompt à envoyer s'il faut le refaire.">
+<meta name="description" content="Le logo du client est-il bon pour l'atelier ? Un fichier vectoriel ou une photo en haute résolution : oui. Sinon, quoi répondre, et le prompt à envoyer.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="manrope-latin.woff2">
 <link rel="stylesheet" href="phare.css">
@@ -29,7 +29,7 @@
         <path d="M11 20h18"/>
       </svg>
       <h2 class="depot__titre">Le logo du client est‑il bon pour l’atelier ?</h2>
-      <p class="depot__texte">Déposez son fichier : une image, une photo, un PDF, peu importe. Le contrôle dit tout de suite s’il est bon, s’il faut le refaire — avec le prompt à envoyer au client — ou s’il est inutilisable.</p>
+      <p class="depot__texte">Déposez son fichier. C’est bon si c’est un fichier vectoriel ou une photo en haute résolution. Sinon, le contrôle donne ce qu’il faut répondre au client, et le prompt à lui envoyer.</p>
       <button class="btn primaire" id="choisir" type="button">Choisir un fichier</button>
       <p class="depot__texte depot__aide" id="aide">Ou glissez-le ici, ou collez-le avec Ctrl + V.</p>
     </section>
@@ -60,7 +60,7 @@
           <button class="btn secondaire" type="button" data-role="copier-dire">Copier</button>
         </div>
         <div class="dire" data-role="bloc-prompt" hidden>
-          <p class="note">Le prompt à lui envoyer, pour ChatGPT</p>
+          <p class="note" data-role="prompt-nom">Le prompt à lui envoyer, pour ChatGPT</p>
           <p class="dire__texte dire__prompt" data-role="prompt"></p>
           <button class="btn primaire" type="button" data-role="copier-prompt">Copier le prompt</button>
         </div>

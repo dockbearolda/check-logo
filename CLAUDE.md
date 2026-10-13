@@ -13,24 +13,32 @@ vérifie dans l'aperçu `check-logo`, `node --test`, on pousse.
 
 ## Ce qui est tranché (ne pas défaire)
 
-- **Une seule réponse, instantanée** (13 octobre 2026, Charlie : « l'idée est
-  que la vendeuse sache instantanément si c'est un logo vectorisé »). Pas de
-  verdict par technique, pas de tailles d'impression, pas de réglage.
-- **On ne mesure pas l'épaisseur des traits** (même jour : « je ne veux pas
-  que tu t'occupes de l'épaisseur »). Ne pas la remettre.
-- **Ce qui passe au vert** : un vrai fichier vectoriel, OU une image propre —
-  nette, à plat, détourée ou sur un fond uni qui part à l'atelier — que
-  l'atelier vectorise.
-- **Une illustration riche et nette passe aussi, TELLE QUELLE** — et la
-  vendeuse annonce que « toute reprise ou modification pour l'améliorer sera
-  facturée ». Cette phrase est de Charlie ; elle revient dès que l'atelier
-  pourrait reprendre le fichier.
-- **À refaire = le client refait lui-même, avec le prompt.** La plupart des
-  logos sortent de ChatGPT. Le prompt s'écrit tout seul d'après ce que le
-  contrôle trouve (`ecrirePrompt`, `lib/verdict.js`) : il ne demande que ce
-  qu'il y a à corriger, et de ne rien changer d'autre.
-- **Inutilisable** : trop petit, trop flou, ou pas une image. À l'écran on
-  écrit « Inutilisable », jamais « pourri » : le client peut voir l'écran.
+- **LA RÈGLE, mot pour mot** (Charlie, 13 octobre 2026) : « ce qui est bon,
+  c'est une photo en haute résolution ou un fichier vectoriel ; pour le reste
+  on renvoie un prompt si ça vient de ChatGPT » — « un logo non vectoriel,
+  avec un fond noir par exemple, c'est une reprise facturée ou un prompt à
+  envoyer ».
+- **Un logo en image n'est JAMAIS bon**, même net, même détouré, même en très
+  grand. Une première version faisait passer au vert les « images propres » :
+  Charlie l'a refusée (« tout ce que j'ouvre, le logiciel me dit c'est bon »).
+  Ne pas y revenir, quelle que soit la qualité de l'image.
+- **Trois réponses** : C'est bon (vectoriel, ou photo en haute résolution) ·
+  À reprendre (tout le reste : le prompt, ou la reprise facturée) ·
+  Inutilisable (trop petit, trop flou, pas une image).
+- **À reprendre = deux sorties, toujours dites ensemble** : le client refait
+  son fichier avec ChatGPT grâce au prompt, ou l'atelier le reprend et
+  « cette reprise est facturée ». Si le fichier est signé ChatGPT, le prompt
+  passe en premier.
+- **Le prompt s'écrit tout seul** d'après ce que le contrôle trouve
+  (`ecrirePrompt`, `lib/verdict.js`) : il ne demande que ce qu'il y a à
+  corriger. Pour un logo, il réclame un VRAI fichier vectoriel SVG — c'est ce
+  qui le fera passer au vert au prochain dépôt.
+- **Une seule réponse, instantanée.** Pas de verdict par technique, pas de
+  tailles d'impression, pas de réglage.
+- **On ne mesure pas l'épaisseur des traits** (« je ne veux pas que tu
+  t'occupes de l'épaisseur »). Ne pas la remettre.
+- **À l'écran on écrit « Inutilisable », jamais « pourri »** : le client peut
+  voir l'écran.
 - **Le faux damier** : une IA à qui l'on demande un fond transparent dessine
   souvent le damier gris et blanc dans l'image. C'est un fond, pas un dessin
   (`lireFond`, `lib/analyse.js`), et le prompt le nomme.
@@ -69,7 +77,7 @@ vérifie dans l'aperçu `check-logo`, `node --test`, on pousse.
 
 ## À faire valider par Charlie
 
-- Le texte du prompt et celui des messages : écrits d'office, à relire sur de
-  vrais cas au comptoir.
-- Une image avec un fond ou un décor part en « à refaire » (avec la porte de
-  sortie « l'imprimer telle quelle, en rectangle ») : à confirmer.
+- `PIXELS_PHOTO` (2 000 pixels) : à partir de quand une photo est « en haute
+  résolution ». Posé d'office ; une image de ChatGPT n'y arrive pas.
+- `PIXELS_POURRI` (500 pixels utiles) : en dessous, « Inutilisable ».
+- Le texte du prompt et celui des messages : à relire sur de vrais cas.
