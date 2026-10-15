@@ -10,6 +10,7 @@ import { toile, rect, disque, flouter, agrandir, photo } from './dessin.mjs'
    noir par exemple, c'est une reprise facturée ou un prompt à envoyer ». */
 
 const BLANC = [255, 255, 255, 255], NOIR = [0, 0, 0, 255], ROUGE = [220, 30, 40]
+const FIN = 'N’hésitez pas si vous avez la moindre question, on est là pour vous accompagner !'
 
 /* Un logo d'essai de `l` pixels de large, à plat : un disque rouge, une
    barre grise. */
@@ -72,8 +73,9 @@ test('un logo en image, même net et détouré, N’EST PAS bon', () => {
     assert.equal(v.etat, 'limite')
     assert.equal(v.mot, 'À reprendre')
     assert.match(v.titre, /^Logo non vectoriel : reprise facturée, ou prompt à envoyer\.$/)
-    assert.match(v.dire, /ce n’est pas un fichier vectoriel/)
-    assert.match(v.dire, /S’il a été créé avec ChatGPT/)
+    assert.match(v.dire, /votre logo n’est pas un fichier vectoriel/)
+    assert.match(v.dire, /• Si vous l’avez généré avec ChatGPT : Retournez simplement dans votre discussion avec lui/)
+    assert.match(v.dire, /• Si votre logo a été créé par un graphiste : /)
     assert.match(v.dire, /cette reprise est facturée/)
     assert.match(v.prompt, /en version vectorielle/)
     assert.match(v.prompt, /vrai fichier vectoriel SVG/)
@@ -93,8 +95,9 @@ test('un logo sur fond noir : le prompt retire le fond noir', () => {
 test('un fichier signé par ChatGPT : le prompt d’abord', () => {
   const v = image(logo(1400, NOIR), { ia: 'ChatGPT' })
   assert.match(v.titre, /prompt à envoyer, ou reprise facturée/)
-  assert.match(v.dire, /Il a été créé avec ChatGPT : renvoyez-lui votre logo/)
+  assert.match(v.dire, /• Vous l’avez généré avec ChatGPT : Retournez simplement dans votre discussion avec lui/)
   assert.match(v.dire, /cette reprise est facturée/)
+  assert.ok(!/graphiste/.test(v.dire))   /* il sait d’où vient son fichier */
   assert.equal(v.promptPour, 'Le prompt à lui envoyer, pour ChatGPT')
   assert.ok(v.constats.some(c => c.texte === 'Créé avec ChatGPT.'))
   assert.equal(image(logo(1400)).promptPour, 'S’il vient de ChatGPT : le prompt à lui envoyer')
@@ -104,13 +107,13 @@ test('une photo ou une illustration trop petite : à reprendre', () => {
   const p = image(photo(1536, 1024), { format: 'jpg' })
   assert.equal(p.etat, 'limite')
   assert.match(p.titre, /^Image trop petite/)
-  assert.match(p.dire, /elle n’est pas en haute résolution/)
-  assert.match(p.dire, /envoyez-nous plutôt l’originale/)
+  assert.match(p.dire, /un peu trop petit ou de résolution insuffisante/)
+  assert.match(p.dire, /Envoyez-nous plutôt l’originale/)
   assert.match(p.prompt, /plus haute résolution possible : au moins 2\s000 pixels/)
   assert.ok(!/SVG/.test(p.prompt))
   const i = image(illustration(1300), { ia: 'ChatGPT' })
   assert.equal(i.etat, 'limite')
-  assert.match(i.dire, /Elle a été créée avec ChatGPT/)
+  assert.match(i.dire, /Vous l’avez généré avec ChatGPT/)
   assert.match(i.prompt, /Garde le même style/)
 })
 
@@ -136,7 +139,7 @@ test('trop petit ou trop flou : inutilisable', () => {
   assert.equal(petit.etat, 'non')
   assert.equal(petit.mot, 'Inutilisable')
   assert.equal(petit.titre, 'Image trop petite.')
-  assert.match(petit.dire, /retournez dans la conversation où il a été créé/)
+  assert.match(petit.dire, /Retournez simplement dans votre discussion avec lui, transmettez-lui notre message/)
   assert.ok(!/reprise/.test(petit.dire))             /* rien à reprendre */
   assert.ok(petit.prompt.length > 0)
   const flou = image(agrandir(logo(250), 4))
@@ -176,11 +179,12 @@ test('ce qui ne s’ouvre pas : une impasse, jamais une erreur', () => {
   assert.equal(juger({ format: 'pdf', sorte: 'mixte', natif: null }, analyser(mixte.d, mixte.l, mixte.h)).etat, 'inconnu')
 })
 
-test('ce qu’on envoie au client : le message, puis le prompt', () => {
+test('ce qu’on envoie au client : le message, notre prompt, la main tendue', () => {
   const v = image(logo(1400, NOIR), { ia: 'ChatGPT' })
-  assert.ok(v.envoi.startsWith(v.dire))
-  assert.ok(v.envoi.endsWith(v.prompt))
-  assert.match(v.envoi, /\n\nLe message pour ChatGPT :\n/)
+  const [haut] = v.dire.split('\n\n' + FIN)
+  assert.ok(v.envoi.startsWith(haut))
+  assert.ok(v.envoi.includes(`\n\nNotre message pour ChatGPT :\n${v.prompt}\n\n`))
+  assert.ok(v.envoi.endsWith(FIN))
   const t = logo(1600)
   const ok = juger({ format: 'pdf', sorte: 'vecteur', natif: null, ia: null }, analyser(t.d, t.l, t.h))
   assert.equal(ok.envoi, ok.dire)
@@ -226,7 +230,7 @@ test('une capture d’écran n’est jamais bonne : le fichier d’origine vaut 
   assert.match(grande.dire, /capture d’écran/)
   /* elle a ses pixels : on ne lui dit pas qu’elle est trop petite */
   assert.match(grande.titre, /^Capture d’écran : /)
-  assert.match(grande.dire, /c’est une capture d’écran, pas le fichier d’origine/)
+  assert.match(grande.dire, /une capture d’écran : ce n’est pas le fichier d’origine/)
   assert.ok(!/haute résolution|trop petite/.test(grande.dire + grande.titre))
   assert.ok(!grande.constats.some(c => /pixels utiles/.test(c.texte)))
   assert.equal(image(photo(1600, 1200), { format: 'png' }, 2796).etat, 'ok')
@@ -251,4 +255,25 @@ test('un lecteur qui ne se charge pas n’est pas un fichier abîmé', () => {
   assert.match(v.titre, /connexion/)
   assert.ok(!/abîmé|renvoyer/.test(v.dire))
   assert.equal(v.prompt, '')
+})
+
+test('le message au client : toujours le même style', () => {
+  const t = logo(1600)
+  const cas = [
+    juger({ format: 'pdf', sorte: 'vecteur', natif: null, ia: null }, analyser(t.d, t.l, t.h)),
+    image(photo(1600, 1200), { format: 'jpg' }, 4032),
+    image(logo(1400, NOIR)), image(logo(1400, NOIR), { ia: 'ChatGPT' }), image(logo(300, BLANC)),
+    image(photo(1536, 1024), { format: 'jpg' }), image(logo(1400), { capture: true }),
+    ...['eps', 'psd', 'tif', 'mixte', 'bureau', 'inconnu', 'vide', 'graphiste', 'video', 'lecteur']
+      .map(impasse => juger({ nom: 'logo.x', sorte: 'impasse', impasse, natif: null }, null)),
+  ]
+  for (const v of cas) {
+    assert.ok(v.dire.startsWith('Bonjour !\nMerci pour votre envoi. '), v.dire)
+    assert.ok(v.dire.endsWith('\n\n' + FIN), v.dire)
+    /* des solutions : annoncées, puis une par puce */
+    if (v.dire.includes('•')) assert.match(v.dire, /\nPour que le résultat soit parfait, voici comment faire :\n\n• /)
+    if (!v.prompt) assert.equal(v.envoi, v.dire)
+  }
+  /* trop petit : le texte de Charlie, mot pour mot */
+  assert.match(image(logo(300, BLANC)).dire, /^Bonjour !\nMerci pour votre envoi\. Malheureusement, le fichier reçu est un peu trop petit ou de résolution insuffisante pour qu’on puisse l’exploiter proprement en production\.\nPour que le résultat soit parfait, voici comment faire :\n\n• Si vous l’avez généré avec ChatGPT : Retournez simplement dans votre discussion avec lui, transmettez-lui notre message, et renvoyez-nous le nouveau fichier qu’il vous fournira\.\n• Si votre logo a été créé par un graphiste : Le plus simple est de lui demander directement le fichier vectoriel d’origine \(au format PDF, AI, SVG ou EPS\)\.\n\nN’hésitez pas/)
 })

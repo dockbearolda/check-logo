@@ -186,9 +186,9 @@ main { flex: 1; display: flex; flex-direction: column; }
   padding: var(--pas-3);
   border-radius: var(--arrondi-bloc); background: var(--zone-bg);
 }
-.dire__texte { text-wrap: pretty; }
-/* Le prompt garde ses lignes : il se colle tel quel dans ChatGPT. */
-.dire__prompt { white-space: pre-line; }
+/* Le message et le prompt gardent leurs lignes : ils se collent tels quels
+   dans WhatsApp, un courriel ou ChatGPT. */
+.dire__texte { text-wrap: pretty; white-space: pre-line; }
 .dire .btn { align-self: flex-start; }
 
 /* ------------------------------------------------------- LES FICHIERS DÉPOSÉS
