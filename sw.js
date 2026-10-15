@@ -18,12 +18,12 @@
    « check-logo- », et on ne supprime jamais que les nôtres.
    Changer la liste de la coquille : changer VERSION. */
 const PREFIXE = 'check-logo-'
-const VERSION = PREFIXE + '1'
+const VERSION = PREFIXE + '2'
 const PARTAGE = PREFIXE + 'partage'
 const COQUILLE = [
   './', 'index.html', 'app.css', 'phare.css', 'phare-composants.css', 'manifest.webmanifest',
   'favicon.svg', 'manrope-latin.woff2', 'manrope-latin-ext.woff2',
-  'lib/app.js', 'lib/lecture.js', 'lib/format.js', 'lib/analyse.js', 'lib/travail.js', 'lib/verdict.js', 'lib/regles.js',
+  'lib/app.js', 'lib/lecture.js', 'lib/format.js', 'lib/mesures.js', 'lib/travail.js', 'lib/verdict.js', 'lib/regles.js',
 ]
 /* 3 Mo : ils se téléchargent une fois, après la coquille. S'ils manquent, la
    coquille s'installe quand même — ils viendront au premier usage. */
