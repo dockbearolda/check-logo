@@ -199,7 +199,7 @@ test('plusieurs fichiers : le meilleur gagne', () => {
 test('un fichier de graphiste, une vidéo : leur réponse', () => {
   const g = juger({ nom: 'Logo client.cdr', format: 'cdr', sorte: 'impasse', impasse: 'graphiste', natif: null }, null)
   assert.equal(g.etat, 'inconnu')
-  assert.equal(g.mot, 'À voir à l’atelier')
+  assert.equal(g.mot, 'À vérifier')
   assert.equal(g.titre, 'Fichier CorelDRAW : il ne s’ouvre pas ici.')
   assert.match(g.constats[0].texte, /CorelDRAW.*vectoriel/)
   assert.match(g.dire, /fichier professionnel/)

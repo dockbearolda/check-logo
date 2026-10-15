@@ -1,7 +1,7 @@
 {
-  "name": "Check logo · OLDA",
+  "name": "Check logo",
   "short_name": "Check logo",
-  "description": "Le logo du client est-il bon pour l’atelier ? Une réponse, ce qu’il faut lui dire, et le prompt s’il doit le refaire.",
+  "description": "Le logo du client est-il bon ? Une réponse, ce qu’il faut lui dire, et le prompt s’il doit le refaire.",
   "lang": "fr",
   "id": "./",
   "start_url": "./",
