@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { formatDe, formatParNom, impasseDe, origineIA } from '../lib/format.js'
+import { formatDe, formatParNom, impasseDe, origineIA, estCapture } from '../lib/format.js'
 import { compterOperations } from '../lib/lecture.js'
 
 const octets = (...o) => new Uint8Array([...o, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -64,4 +64,44 @@ test('créé par une IA : la signature du fichier, ou son nom', () => {
   assert.equal(origineIA(new Uint8Array(8), 'Image ChatGPT 30 sept. 2026, 11_48_57.png'), 'ChatGPT')
   assert.equal(origineIA(new Uint8Array(8), 'DALL·E 2025-01-12 logo.webp'), 'ChatGPT')
   assert.equal(origineIA(new Uint8Array(8), 'logo-client.png'), null)
+})
+
+test('une vidéo, un CorelDRAW : dans les octets', () => {
+  assert.equal(formatDe(texte('\0\0\0\x20ftypisom\0\0\0\0')), 'video')
+  assert.equal(formatDe(texte('\0\0\0\x20ftypmp42\0\0\0\0')), 'video')
+  assert.equal(formatDe(texte('\0\0\0\x14ftypqt  \0\0\0\0')), 'video')
+  assert.equal(formatDe(texte('RIFF\0\0\0\0AVI LIST')), 'video')
+  assert.equal(formatDe(octets(0x1a, 0x45, 0xdf, 0xa3)), 'video')
+  assert.equal(formatDe(texte('RIFF\0\0\0\0CDRGvrsn')), 'cdr')
+  assert.equal(formatDe(texte('\0\0\0\x20ftypheic\0\0\0\0')), 'heic')
+})
+
+test('un CorelDRAW, par le nom', () => {
+  assert.equal(formatParNom('Logo.CDR'), 'cdr')
+})
+
+test('un fichier de graphiste ou une vidéo : une impasse qui dit quoi faire', () => {
+  assert.equal(impasseDe('cdr', 'logo.cdr'), 'graphiste')
+  assert.equal(impasseDe('zip', 'maquette.sketch'), 'graphiste')
+  assert.equal(impasseDe('zip', 'maquette.fig'), 'graphiste')
+  assert.equal(impasseDe('zip', 'maquette.xd'), 'graphiste')
+  assert.equal(impasseDe(null, 'logo.afdesign'), 'graphiste')
+  assert.equal(impasseDe(null, 'plan.dxf'), 'graphiste')
+  assert.equal(impasseDe('eps', 'logo.ai'), 'graphiste')   /* un vieil Illustrator */
+  assert.equal(impasseDe('eps', 'logo.eps'), 'eps')
+  assert.equal(impasseDe('video', 'film.mp4'), 'video')
+  assert.equal(impasseDe(null, 'film.MOV'), 'video')
+  assert.equal(impasseDe('zip', 'logo.docx'), 'bureau')
+})
+
+test('une capture d’écran se reconnaît à son nom', () => {
+  assert.equal(estCapture('Capture d’écran 2026-10-15 à 10.12.33.png'), true)
+  assert.equal(estCapture('Capture d\'écran 2026-10-15 à 10.12.33.png'), true)
+  assert.equal(estCapture('Capture écran.PNG'), true)
+  /* le nom tel que macOS le donne, les accents décomposés */
+  assert.equal(estCapture('Capture d’écran 2026-10-15 à 10.12.33.png'.normalize('NFD')), true)
+  assert.equal(estCapture('Screenshot_20261015-101233.png'), true)
+  assert.equal(estCapture('Screen Shot 2026-10-15 at 10.12.33.png'), true)
+  assert.equal(estCapture('logo.png'), false)
+  assert.equal(estCapture(''), false)
 })

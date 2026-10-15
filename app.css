@@ -7,6 +7,9 @@
 
    Pensée d'abord pour le téléphone : une colonne. À partir de 900 px, le
    fichier à gauche, la réponse à droite.
+
+   Le titre d'une carte (`.titre-carte`) est le même partout : la liste des
+   fichiers et les constats portent le même composant.
    =========================================================================== */
 
 @font-face {
@@ -67,6 +70,11 @@ main { flex: 1; display: flex; flex-direction: column; }
 
 .pied { text-align: center; }
 
+.titre-carte {
+  font-size: var(--taille-titre); font-weight: var(--graisse-forte);
+  line-height: var(--ligne-titre); letter-spacing: -.01em;
+}
+
 /* ------------------------------------------------------------------ LE DÉPÔT
    L'écran vide est une invitation : une seule zone, une seule action. */
 .depot {
@@ -90,7 +98,11 @@ main { flex: 1; display: flex; flex-direction: column; }
 .depot__aide { display: none; }
 @media (hover: hover) and (pointer: fine) { .depot__aide { display: block; } }
 
-/* ---------------------------------------------------------------- LE RÉSULTAT */
+/* ---------------------------------------------------------------- LE RÉSULTAT
+   Sur le téléphone, dans l'ordre de lecture : le fichier, la réponse, les
+   autres fichiers, les constats. Sur un grand écran, la réponse à droite et
+   tout le reste à gauche — la liste des fichiers n'y prend une rangée que
+   quand elle existe (`.plusieurs`), sinon son écart resterait. */
 .resultat { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--pas-3); }
 @media (min-width: 900px) {
   .resultat {
@@ -99,8 +111,13 @@ main { flex: 1; display: flex; flex-direction: column; }
     grid-template-areas: "apercu verdict" "constats verdict";
     align-items: start;
   }
+  .resultat.plusieurs {
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: "apercu verdict" "fichiers verdict" "constats verdict";
+  }
   .apercu { grid-area: apercu; }
   .verdict { grid-area: verdict; }
+  .fichiers { grid-area: fichiers; }
   .constats { grid-area: constats; }
 }
 
@@ -160,6 +177,9 @@ main { flex: 1; display: flex; flex-direction: column; }
   line-height: var(--ligne-titre); letter-spacing: -.02em; text-wrap: balance;
 }
 .verdict__titre { font-weight: var(--graisse-note); text-wrap: pretty; }
+/* LE GESTE PRINCIPAL : tout envoyer au client. Sous le pouce, sur toute la
+   largeur, sur le téléphone ; à sa taille sur un grand écran. */
+@media (min-width: 900px) { .verdict__envoi { align-self: flex-start; } }
 
 .dire {
   display: flex; flex-direction: column; gap: var(--pas-2);
@@ -171,12 +191,30 @@ main { flex: 1; display: flex; flex-direction: column; }
 .dire__prompt { white-space: pre-line; }
 .dire .btn { align-self: flex-start; }
 
+/* ------------------------------------------------------- LES FICHIERS DÉPOSÉS
+   Une ligne par fichier : sa marque, son nom, sa réponse. Celle qu'on
+   regarde est surlignée. Une ligne entière se touche — elle fait au moins
+   la hauteur d'un doigt (le rond serré, plus son rembourrage). */
+.fichiers { display: flex; flex-direction: column; gap: var(--pas-2); }
+.fichiers__liste { display: flex; flex-direction: column; gap: var(--pas-1); }
+.fichier {
+  box-sizing: border-box; width: 100%;
+  display: flex; align-items: center; gap: var(--pas-2);
+  margin: 0; padding: var(--pas-2);
+  border: var(--trait-reserve); border-radius: var(--arrondi-champ);
+  background: transparent; color: var(--text-1);
+  font: inherit; line-height: var(--ligne-champ); text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+}
+.fichier:hover { background: var(--row-hover); }
+.fichier:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.fichier[aria-current="true"] { background: var(--primary-soft); border-color: var(--border); }
+.fichier__nom { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fichier__mot { color: var(--text-2); font-weight: var(--graisse-note); white-space: nowrap; }
+
 /* ---------------------------------------------------------------- LES CONSTATS */
 .constats { display: flex; flex-direction: column; gap: var(--pas-2); }
-.constats__titre {
-  font-size: var(--taille-titre); font-weight: var(--graisse-forte);
-  line-height: var(--ligne-titre); letter-spacing: -.01em;
-}
 .constats__liste li {
   display: flex; align-items: flex-start; gap: var(--pas-2);
   padding: var(--pas-2) 0;
