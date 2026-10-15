@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { lireFond, lireEncre, lireCouleurs, lireFondu, lireFlou, analyser } from '../lib/analyse.js'
+import { lireFond, lireEncre, lireCouleurs, lireFondu, lireFlou, analyser } from '../lib/mesures.js'
 import { FLOU_REF, FLOU_NET, PART_APLAT, FONDU_PART } from '../lib/regles.js'
 import { toile, rect, disque, flouter, agrandir, photo } from './dessin.mjs'
 

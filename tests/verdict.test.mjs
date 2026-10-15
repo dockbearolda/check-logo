@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { juger, ecrirePrompt, nomCouleur, meilleur } from '../lib/verdict.js'
-import { analyser } from '../lib/analyse.js'
+import { analyser } from '../lib/mesures.js'
 import { toile, rect, disque, flouter, agrandir, photo } from './dessin.mjs'
 
 /* LA RÈGLE (Charlie, 13 octobre 2026) : « ce qui est bon, c'est une photo en
@@ -253,6 +253,8 @@ test('un lecteur qui ne se charge pas n’est pas un fichier abîmé', () => {
   assert.equal(v.etat, 'inconnu')
   assert.equal(v.mot, 'À réessayer')
   assert.match(v.titre, /connexion/)
+  assert.match(v.constats[0].texte, /bloqueur de publicité/)
+  assert.match(v.constats[0].texte, /Le fichier n’y est pour rien/)
   assert.ok(!/abîmé|renvoyer/.test(v.dire))
   assert.equal(v.prompt, '')
 })

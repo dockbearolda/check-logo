@@ -51,7 +51,7 @@ fichiers, on vérifie dans l'aperçu `check-logo`, `node --test`, on pousse.
   voir l'écran.
 - **Le faux damier** : une IA à qui l'on demande un fond transparent dessine
   souvent le damier gris et blanc dans l'image. C'est un fond, pas un dessin
-  (`lireFond`, `lib/analyse.js`), et le prompt le nomme.
+  (`lireFond`, `lib/mesures.js`), et le prompt le nomme.
 - **« Créé avec ChatGPT » se lit dans le fichier** (sa signature C2PA, ou son
   nom) — jamais deviné à la taille : elle varie. Une image passée par
   WhatsApp a perdu sa signature : on dit alors « s'il a été créé avec… ».
@@ -73,6 +73,14 @@ fichiers, on vérifie dans l'aperçu `check-logo`, `node --test`, on pousse.
   cache `check-logo-partage`, sur l'appareil, et en est effacé dès qu'il est
   lu. Les caches sont communs à tout le domaine qui l'héberge : tous les nôtres
   portent le préfixe `check-logo-`, et `sw.js` ne supprime que ceux-là.
+- **Un nom de fichier que les bloqueurs de pub laissent passer.** Le
+  15 octobre 2026, chaque image répondait « Le fichier ne s'ouvre pas » chez
+  Charlie : la liste EasyPrivacy (uBlock Origin, AdGuard, Brave) bloque tout
+  fichier nommé `analyse.js`. Le fichier des mesures s'appelle donc
+  `lib/mesures.js`, et `tests/bloqueurs.test.mjs` refuse tout nom publié qui
+  contient un mot visé (analyse, stats, track, pixel, pub…). Et quand une
+  partie de l'outil ne se charge pas, la réponse dit « À réessayer » : le
+  fichier du client n'y est pour rien.
 - **Tout se calcule sur l'appareil.** Aucun serveur, aucune clé, aucun envoi :
   le fichier du client ne quitte pas le poste. Pas d'IA en ligne.
 - **Jamais un mot de graphiste dans ce qu'elle dit au client.** Les phrases
@@ -95,7 +103,7 @@ fichiers, on vérifie dans l'aperçu `check-logo`, `node --test`, on pousse.
 | `lib/app.js` | l'écran : déposer, choisir, coller, recevoir un partage ; le scan ; la réponse, l'envoi au client, la liste quand il y a plusieurs fichiers |
 | `sw.js`, `manifest.webmanifest`, `icone-*.png` | l'app installée : hors ligne, et la cible de partage Android (changer `VERSION` dans `sw.js` quand la liste de la coquille change) |
 | `lib/lecture.js`, `lib/format.js` | le fichier lu : son format dans ses octets, PNG/JPG/WebP/HEIC, SVG, PDF et `.ai` (vectoriel, ou une image emballée), la signature de ChatGPT, et ce qui ne s'ouvre pas ici (EPS, PSD, Word…) |
-| `lib/analyse.js`, `lib/travail.js` | les mesures, dans un fil : le fond (et le faux damier), les couleurs, le flou, les ombres |
+| `lib/mesures.js`, `lib/travail.js` | les mesures, dans un fil : le fond (et le faux damier), les couleurs, le flou, les ombres |
 | `lib/verdict.js` | le jugement, ses phrases et le prompt |
 | `lib/regles.js` | tous les seuils |
 | `outils/banc.mjs`, `outils/png.mjs` | le banc : le contrôle passé sur un dossier de vrais fichiers, hors du navigateur (`--prompt` montre les prompts) |
