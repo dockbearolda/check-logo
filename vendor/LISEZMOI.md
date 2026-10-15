@@ -1,7 +1,7 @@
 # vendor — les lecteurs de fichiers
 
-Check logo n'installe rien : ces fichiers sont copiés tels quels depuis le
-Logo maker (`logo-maker/vendor/`), qui les tient des paquets npm. Ils ne se
+Check logo n'installe rien : ces fichiers sont copiés tels quels des paquets
+npm. Ils ne se
 chargent qu'au premier fichier qui en a besoin (`lib/lecture.js`) : un PNG
 déposé n'en tire pas un octet.
 

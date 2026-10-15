@@ -13,9 +13,9 @@
       PARTAGE, sur l'appareil, et la page s'ouvre avec ?partage pour le
       prendre (lib/app.js). Rien ne quitte le poste.
 
-   Le stockage des caches est commun à tout le site (le portail, le Logo
-   maker…) : chaque cache d'ici porte le préfixe « check-logo- », et on ne
-   supprime jamais que les nôtres.
+   Le stockage des caches est commun à tout le domaine qui héberge l'app
+   (d'autres pages peuvent y vivre) : chaque cache d'ici porte le préfixe
+   « check-logo- », et on ne supprime jamais que les nôtres.
    Changer la liste de la coquille : changer VERSION. */
 const PREFIXE = 'check-logo-'
 const VERSION = PREFIXE + '1'
@@ -68,8 +68,8 @@ async function reseauDabord(requete) {
   }
 }
 
-/* Seul ce qui est sous le dossier de l'app passe ici : les autres outils du
-   même site (le portail, le Logo maker…) ne sont jamais gardés. */
+/* Seul ce qui est sous le dossier de l'app passe ici : les autres pages du
+   même domaine ne sont jamais gardées. */
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url)
   if (!url.href.startsWith(self.registration.scope)) return

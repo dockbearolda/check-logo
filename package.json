@@ -1,7 +1,7 @@
 {
-  "name": "check-logo-olda",
+  "name": "check-logo",
   "private": true,
-  "description": "Check logo — le logo du client est-il bon pour l'atelier ? Une réponse, ce qu'il faut lui dire, et le prompt s'il doit le refaire. En ligne sur https://dockbearolda.github.io/check-logo/",
+  "description": "Check logo — le logo du client est-il bon ? Une réponse, ce qu'il faut lui dire, et le prompt s'il doit le refaire.",
   "type": "module",
   "engines": { "node": ">=22" },
   "scripts": { "start": "node serveur.mjs", "test": "node --test" }
