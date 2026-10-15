@@ -32,6 +32,13 @@ fichiers, on vérifie dans l'aperçu `check-logo`, `node --test`, on pousse.
   son fichier avec ChatGPT grâce au prompt, ou nous le reprenons, et
   « cette reprise est facturée ». Si le fichier est signé ChatGPT, le prompt
   passe en premier.
+- **Le message au client a un style fixe** (Charlie, 15 octobre 2026) :
+  « Bonjour ! », « Merci pour votre envoi. » et le constat ; puis « Pour que
+  le résultat soit parfait, voici comment faire : » et une solution par puce
+  (« à qui : quoi faire ») ; enfin « N’hésitez pas si vous avez la moindre
+  question, on est là pour vous accompagner ! ». Le cas « trop petit »
+  reprend son texte mot pour mot. Tout passe par `message` (`lib/verdict.js`),
+  et un test garde le style.
 - **Le prompt s'écrit tout seul** d'après ce que le contrôle trouve
   (`ecrirePrompt`, `lib/verdict.js`) : il ne demande que ce qu'il y a à
   corriger. Pour un logo, il réclame un VRAI fichier vectoriel SVG — c'est ce
@@ -103,6 +110,6 @@ fichiers, on vérifie dans l'aperçu `check-logo`, `node --test`, on pousse.
 - `PIXELS_POURRI` (500 pixels utiles) : en dessous, « Inutilisable ».
 - La capture d'écran jamais bonne, même grande (posé d'office, 15 octobre
   2026) : à confirmer.
-- Le texte envoyé d'un geste : le message, puis « Le message pour
-  ChatGPT : » et le prompt.
+- Le texte envoyé d'un geste : le message, « Notre message pour
+  ChatGPT : » et le prompt, puis la formule de fin.
 - Le texte du prompt et celui des messages : à relire sur de vrais cas.
