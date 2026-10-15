@@ -46,6 +46,23 @@ vérifie dans l'aperçu `check-logo`, `node --test`, on pousse.
   nom) — jamais deviné à la taille : elle varie. Une image passée par
   WhatsApp a perdu sa signature : on dit alors « s'il a été créé avec… ».
 - **Téléphone d'abord, puis PC.** Une colonne jusqu'à 900 px, deux au-delà.
+- **Un seul geste pour répondre au client** : le bouton noir (« Envoyer au
+  client » sur un téléphone, « Copier le message et le prompt » sur un
+  ordinateur) envoie `envoi` — ce qu'on lui dit, puis le prompt. Il tient
+  dans le premier écran d'un iPhone, sans défiler.
+- **Plusieurs fichiers : le meilleur gagne** (`meilleur`, `lib/verdict.js`) :
+  c'est bon › à voir à l'atelier › à reprendre › inutilisable ; à égalité,
+  le premier déposé. Les autres restent dans une liste, à un clic.
+- **Une capture d'écran n'est jamais bonne** (reconnue à son nom,
+  `estCapture`) : ce n'est jamais le fichier d'origine — une capture d'un
+  téléphone fait 2 800 pixels et passerait pour une photo en haute
+  résolution. La lecture la plus stricte de la règle.
+- **L'app s'installe** (`manifest.webmanifest`, `sw.js`) : elle s'ouvre hors
+  ligne (réseau d'abord, la copie gardée sinon) et, sur Android, reçoit le
+  fichier qu'on lui partage depuis WhatsApp. Le fichier partagé passe par le
+  cache `check-logo-partage`, sur l'appareil, et en est effacé dès qu'il est
+  lu. Les caches sont communs à tout le site du portail : tous les nôtres
+  portent le préfixe `check-logo-`, et `sw.js` ne supprime que ceux-là.
 - **Tout se calcule sur l'appareil.** Aucun serveur, aucune clé, aucun envoi :
   le fichier du client ne quitte pas le poste. Pas d'IA en ligne.
 - **Jamais un mot de graphiste dans ce qu'elle dit au client.** Les phrases
@@ -65,7 +82,8 @@ vérifie dans l'aperçu `check-logo`, `node --test`, on pousse.
 | Où | Quoi |
 |---|---|
 | `index.html`, `app.css` | la page ; `phare.css` et `phare-composants.css` sont la charte, copiée telle quelle (plus trois jetons : `--dur-scan`, `--support-clair`, `--support-sombre`) |
-| `lib/app.js` | l'écran : déposer, choisir, coller ; le scan ; la réponse, le message et le prompt à copier |
+| `lib/app.js` | l'écran : déposer, choisir, coller, recevoir un partage ; le scan ; la réponse, l'envoi au client, la liste quand il y a plusieurs fichiers |
+| `sw.js`, `manifest.webmanifest`, `icone-*.png` | l'app installée : hors ligne, et la cible de partage Android (changer `VERSION` dans `sw.js` quand la liste de la coquille change) |
 | `lib/lecture.js`, `lib/format.js` | le fichier lu : son format dans ses octets, PNG/JPG/WebP/HEIC, SVG, PDF et `.ai` (vectoriel, ou une image emballée), la signature de ChatGPT, et ce qui ne s'ouvre pas ici (EPS, PSD, Word…) |
 | `lib/analyse.js`, `lib/travail.js` | les mesures, dans un fil : le fond (et le faux damier), les couleurs, le flou, les ombres |
 | `lib/verdict.js` | le jugement, ses phrases et le prompt |
@@ -80,4 +98,8 @@ vérifie dans l'aperçu `check-logo`, `node --test`, on pousse.
 - `PIXELS_PHOTO` (2 000 pixels) : à partir de quand une photo est « en haute
   résolution ». Posé d'office ; une image de ChatGPT n'y arrive pas.
 - `PIXELS_POURRI` (500 pixels utiles) : en dessous, « Inutilisable ».
+- La capture d'écran jamais bonne, même grande (posé d'office, 15 octobre
+  2026) : à confirmer.
+- Le texte envoyé d'un geste : le message, puis « Le message pour
+  ChatGPT : » et le prompt.
 - Le texte du prompt et celui des messages : à relire sur de vrais cas.

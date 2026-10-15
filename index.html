@@ -8,6 +8,8 @@
 <title>Check logo · OLDA</title>
 <meta name="description" content="Le logo du client est-il bon pour l'atelier ? Un fichier vectoriel ou une photo en haute résolution : oui. Sinon, quoi répondre, et le prompt à envoyer.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="icone-180.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="manrope-latin.woff2">
 <link rel="stylesheet" href="phare.css">
 <link rel="stylesheet" href="phare-composants.css">
@@ -29,7 +31,7 @@
         <path d="M11 20h18"/>
       </svg>
       <h2 class="depot__titre">Le logo du client est‑il bon pour l’atelier ?</h2>
-      <p class="depot__texte">Déposez son fichier. C’est bon si c’est un fichier vectoriel ou une photo en haute résolution. Sinon, le contrôle donne ce qu’il faut répondre au client, et le prompt à lui envoyer.</p>
+      <p class="depot__texte">Déposez son fichier, ou tous ceux qu’il vous a envoyés. C’est bon si c’est un fichier vectoriel ou une photo en haute résolution. Sinon, le contrôle donne ce qu’il faut répondre au client, et le prompt à lui envoyer.</p>
       <button class="btn primaire" id="choisir" type="button">Choisir un fichier</button>
       <p class="depot__texte depot__aide" id="aide">Ou glissez-le ici, ou collez-le avec Ctrl + V.</p>
     </section>
@@ -54,20 +56,26 @@
           <h2 class="verdict__mot" data-role="mot">Analyse en cours</h2>
         </div>
         <p class="verdict__titre" data-role="titre" hidden></p>
+        <button class="btn primaire verdict__envoi" type="button" data-role="envoyer" hidden>Envoyer au client</button>
         <div class="dire" data-role="bloc-dire" hidden>
           <p class="note">À dire au client</p>
           <p class="dire__texte" data-role="dire"></p>
-          <button class="btn secondaire" type="button" data-role="copier-dire">Copier</button>
+          <button class="btn secondaire" type="button" data-role="copier-dire">Copier le message</button>
         </div>
         <div class="dire" data-role="bloc-prompt" hidden>
           <p class="note" data-role="prompt-nom">Le prompt à lui envoyer, pour ChatGPT</p>
           <p class="dire__texte dire__prompt" data-role="prompt"></p>
-          <button class="btn primaire" type="button" data-role="copier-prompt">Copier le prompt</button>
+          <button class="btn secondaire" type="button" data-role="copier-prompt">Copier le prompt</button>
         </div>
       </section>
 
+      <section class="carte fichiers" id="fichiers" hidden>
+        <h2 class="titre-carte" id="fichiers-titre">Les fichiers déposés</h2>
+        <ul class="fichiers__liste" id="fichiers-liste" aria-labelledby="fichiers-titre"></ul>
+      </section>
+
       <section class="carte constats" id="constats" hidden>
-        <h2 class="constats__titre">Ce que le contrôle a vu</h2>
+        <h2 class="titre-carte">Ce que le contrôle a vu</h2>
         <ul class="constats__liste" id="liste"></ul>
       </section>
 
@@ -77,7 +85,7 @@
   <p class="note pied">Le fichier reste sur cet appareil : rien n’est envoyé.</p>
 </div>
 
-<input type="file" id="fichier" hidden>
+<input type="file" id="fichier" multiple hidden>
 <div class="msg-ecran" id="msg" role="alert"></div>
 </body>
 </html>

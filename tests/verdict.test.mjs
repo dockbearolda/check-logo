@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { juger, ecrirePrompt, nomCouleur } from '../lib/verdict.js'
+import { juger, ecrirePrompt, nomCouleur, meilleur } from '../lib/verdict.js'
 import { analyser } from '../lib/analyse.js'
 import { toile, rect, disque, flouter, agrandir, photo } from './dessin.mjs'
 
@@ -174,4 +174,81 @@ test('ce qui ne s’ouvre pas : une impasse, jamais une erreur', () => {
   assert.equal(image(vide).titre, 'Le fichier est vide.')
   const mixte = logo(1200)
   assert.equal(juger({ format: 'pdf', sorte: 'mixte', natif: null }, analyser(mixte.d, mixte.l, mixte.h)).etat, 'inconnu')
+})
+
+test('ce qu’on envoie au client : le message, puis le prompt', () => {
+  const v = image(logo(1400, NOIR), { ia: 'ChatGPT' })
+  assert.ok(v.envoi.startsWith(v.dire))
+  assert.ok(v.envoi.endsWith(v.prompt))
+  assert.match(v.envoi, /\n\nLe message pour ChatGPT :\n/)
+  const t = logo(1600)
+  const ok = juger({ format: 'pdf', sorte: 'vecteur', natif: null, ia: null }, analyser(t.d, t.l, t.h))
+  assert.equal(ok.envoi, ok.dire)
+  const eps = juger({ format: null, sorte: 'impasse', impasse: 'eps', natif: null }, null)
+  assert.equal(eps.envoi, eps.dire)
+})
+
+test('plusieurs fichiers : le meilleur gagne', () => {
+  assert.equal(meilleur(['limite', 'ok', 'non']), 1)
+  assert.equal(meilleur(['non', 'inconnu', 'limite']), 1)   /* un EPS vaut mieux qu’un JPG */
+  assert.equal(meilleur(['limite', 'limite']), 0)           /* à égalité, le premier déposé */
+  assert.equal(meilleur(['non', 'n’importe quoi']), 0)
+  assert.equal(meilleur([]), -1)
+})
+
+test('un fichier de graphiste, une vidéo : leur réponse', () => {
+  const g = juger({ nom: 'Logo client.cdr', format: 'cdr', sorte: 'impasse', impasse: 'graphiste', natif: null }, null)
+  assert.equal(g.etat, 'inconnu')
+  assert.equal(g.mot, 'À voir à l’atelier')
+  assert.equal(g.titre, 'Fichier CorelDRAW : il ne s’ouvre pas ici.')
+  assert.match(g.constats[0].texte, /CorelDRAW.*vectoriel/)
+  assert.match(g.dire, /fichier professionnel/)
+  assert.match(juger({ nom: 'logo.ai', format: 'eps', sorte: 'impasse', impasse: 'graphiste' }, null).titre, /Fichier Illustrator/)
+  assert.match(juger({ nom: 'logo.dxf', format: null, sorte: 'impasse', impasse: 'graphiste' }, null).titre, /Fichier DXF/)
+  const v = juger({ nom: 'logo.mp4', format: 'video', sorte: 'impasse', impasse: 'video', natif: null }, null)
+  assert.equal(v.etat, 'non')
+  assert.equal(v.mot, 'Inutilisable')
+  assert.match(v.titre, /vidéo/)
+  assert.match(v.dire, /une vidéo/)
+  assert.equal(v.prompt, '')
+})
+
+test('une capture d’écran n’est jamais bonne : le fichier d’origine vaut mieux', () => {
+  const v = image(logo(1400, BLANC), { capture: true })
+  assert.equal(v.etat, 'limite')
+  assert.match(v.dire, /capture d’écran/)
+  assert.match(v.dire, /fichier d’origine/)
+  assert.ok(v.constats.some(c => /Capture d’écran/.test(c.texte)))
+  /* grande comme l’écran d’un téléphone, une capture n’est pas une photo en
+     haute résolution */
+  const grande = image(photo(1600, 1200), { format: 'png', capture: true }, 2796)
+  assert.equal(grande.etat, 'limite')
+  assert.match(grande.dire, /capture d’écran/)
+  /* elle a ses pixels : on ne lui dit pas qu’elle est trop petite */
+  assert.match(grande.titre, /^Capture d’écran : /)
+  assert.match(grande.dire, /c’est une capture d’écran, pas le fichier d’origine/)
+  assert.ok(!/haute résolution|trop petite/.test(grande.dire + grande.titre))
+  assert.ok(!grande.constats.some(c => /pixels utiles/.test(c.texte)))
+  assert.equal(image(photo(1600, 1200), { format: 'png' }, 2796).etat, 'ok')
+  const petite = image(logo(300, BLANC), { capture: true })
+  assert.equal(petite.etat, 'non')
+  assert.match(petite.dire, /capture d’écran/)
+})
+
+test('une grande image au faux damier : c’est le damier qu’on annonce, pas sa taille', () => {
+  const v = image(surDamier(illustration(1600)), {}, 3200)
+  assert.equal(v.etat, 'limite')
+  assert.match(v.titre, /^Faux fond transparent : /)
+  assert.ok(!/haute résolution|trop petite/.test(v.dire + v.titre))
+  assert.ok(!v.constats.some(c => /pixels utiles/.test(c.texte)))
+  assert.match(v.prompt, /supprime le damier/)
+})
+
+test('un lecteur qui ne se charge pas n’est pas un fichier abîmé', () => {
+  const v = juger({ nom: 'logo.pdf', format: 'pdf', sorte: 'impasse', impasse: 'lecteur', natif: null }, null)
+  assert.equal(v.etat, 'inconnu')
+  assert.equal(v.mot, 'À réessayer')
+  assert.match(v.titre, /connexion/)
+  assert.ok(!/abîmé|renvoyer/.test(v.dire))
+  assert.equal(v.prompt, '')
 })

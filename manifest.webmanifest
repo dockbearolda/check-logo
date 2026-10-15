@@ -1,0 +1,29 @@
+{
+  "name": "Check logo · OLDA",
+  "short_name": "Check logo",
+  "description": "Le logo du client est-il bon pour l’atelier ? Une réponse, ce qu’il faut lui dire, et le prompt s’il doit le refaire.",
+  "lang": "fr",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f6f8",
+  "theme_color": "#f5f6f8",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "share_target": {
+    "action": "./partage",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [{
+        "name": "fichiers",
+        "accept": ["image/*", "application/pdf", "application/postscript", ".svg", ".pdf", ".ai", ".eps", ".heic", ".cdr"]
+      }]
+    }
+  }
+}
